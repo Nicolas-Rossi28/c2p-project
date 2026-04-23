@@ -18,7 +18,6 @@ class ClienteViewSet(viewsets.ModelViewSet):
     serializer_class = ClienteSerializer
     permission_classes = [IsAuthenticated]
 
-    
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['nome', 'email', 'cidade']
     ordering_fields = ['nome', 'data_criacao', 'ativo']
@@ -38,7 +37,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
 
         ativo = self.request.query_params.get('ativo')
         if ativo is not None:
-            # Converte string 'true'/'false' para boolean
+            
             queryset = queryset.filter(ativo=ativo.lower() == 'true')
 
         return queryset

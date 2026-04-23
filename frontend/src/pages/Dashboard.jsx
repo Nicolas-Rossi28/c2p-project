@@ -14,63 +14,47 @@ export default function Dashboard() {
   const [resumo, setResumo] = useState(null)
   const [filtros, setFiltros] = useState(FILTROS_INICIAIS)
   const [paginacao, setPaginacao] = useState({ count: 0, next: null, previous: null, currentPage: 1 })
-
   const [carregandoClientes, setCarregandoClientes] = useState(true)
   const [carregandoResumo, setCarregandoResumo] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [excluindo, setExcluindo] = useState(false)
-
   const [modalAberto, setModalAberto] = useState(false)
   const [clienteEditando, setClienteEditando] = useState(null)
   const [clienteExcluindo, setClienteExcluindo] = useState(null)
   const [toast, setToast] = useState(null)
 
-  // useCallback evita recriar a função a cada render
-  // Isso é importante porque ela é usada como dependência no useEffect
+  const mostrarToast = useCallback((mensagem, tipo = 'sucesso') => {
+    setToast({ mensagem, tipo })
+    setTimeout(() => setToast(null), 3000)
+  }, [])
+
   const carregarClientes = useCallback(async () => {
     setCarregandoClientes(true)
     try {
       const response = await clientesService.listar(filtros)
       setClientes(response.data.results)
-      setPaginacao({
-        count: response.data.count,
-        next: response.data.next,
-        previous: response.data.previous,
-        currentPage: filtros.page,
-      })
+      setPaginacao({ count: response.data.count, next: response.data.next, previous: response.data.previous, currentPage: filtros.page })
     } catch {
       mostrarToast('Erro ao carregar clientes.', 'erro')
     } finally {
       setCarregandoClientes(false)
     }
-  }, [filtros])
+  }, [filtros, mostrarToast])
 
-  const carregarResumo = async () => {
+  const carregarResumo = useCallback(async () => {
     setCarregandoResumo(true)
     try {
       const response = await clientesService.resumo()
       setResumo(response.data)
     } catch {
-      // Silencioso — o resumo é secundário
+      // resumo é secundário — falha silenciosa
     } finally {
       setCarregandoResumo(false)
     }
-  }
-
-  // Recarrega clientes sempre que os filtros mudam
-  useEffect(() => {
-    carregarClientes()
-  }, [carregarClientes])
-
-  // Resumo carrega só uma vez na montagem
-  useEffect(() => {
-    carregarResumo()
   }, [])
 
-  const mostrarToast = (mensagem, tipo = 'sucesso') => {
-    setToast({ mensagem, tipo })
-    setTimeout(() => setToast(null), 3000)
-  }
+  useEffect(() => { carregarClientes() }, [carregarClientes])
+  useEffect(() => { carregarResumo() }, [carregarResumo])
 
   const handleSalvar = async (form) => {
     setSalvando(true)
@@ -87,9 +71,7 @@ export default function Dashboard() {
       carregarClientes()
       carregarResumo()
     } catch (error) {
-      const msg = error.response?.data?.email?.[0]
-        || error.response?.data?.detail
-        || 'Erro ao salvar cliente.'
+      const msg = error.response?.data?.email?.[0] || error.response?.data?.detail || 'Erro ao salvar.'
       mostrarToast(msg, 'erro')
     } finally {
       setSalvando(false)
@@ -105,7 +87,7 @@ export default function Dashboard() {
       carregarClientes()
       carregarResumo()
     } catch {
-      mostrarToast('Erro ao excluir cliente.', 'erro')
+      mostrarToast('Erro ao excluir.', 'erro')
     } finally {
       setExcluindo(false)
     }
@@ -113,41 +95,40 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <CardsResumo resumo={resumo} carregando={carregandoResumo} />
+      {/* Topbar — padding reduzido */}
+      <div style={{ padding: '10px 24px', background: '#fff', borderBottom: '1px solid #ebebea', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <div>
+          <div style={{ fontSize: '20px', fontWeight: 600, color: '#1c1c1a' }}>Clientes</div>
+          <div style={{ fontSize: '16px', color: '#888780', marginTop: '1px' }}>Gerencie sua base de clientes</div>
+        </div>
+      </div>
 
-      <Filtros
-        filtros={filtros}
-        onChange={setFiltros}
-        onNovo={() => {
-          setClienteEditando(null)
-          setModalAberto(true)
-        }}
-      />
+      {/* Conteúdo — gap e padding menores */}
+      <div style={{ flex: 1, padding: '12px 24px', display: 'flex', flexDirection: 'column', gap: '10px', overflow: 'hidden' }}>
+        <CardsResumo resumo={resumo} carregando={carregandoResumo} />
 
-      <TabelaClientes
-        clientes={clientes}
-        carregando={carregandoClientes}
-        paginacao={paginacao}
-        onPagina={(page) => setFiltros((f) => ({ ...f, page }))}
-        onEditar={(cliente) => {
-          setClienteEditando(cliente)
-          setModalAberto(true)
-        }}
-        onExcluir={setClienteExcluindo}
-      />
+        <div style={{ background: '#fff', border: '1px solid #ebebea', borderRadius: '10px', display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+          <Filtros filtros={filtros} onChange={setFiltros} onNovo={() => { setClienteEditando(null); setModalAberto(true) }} />
+          <TabelaClientes
+            clientes={clientes}
+            carregando={carregandoClientes}
+            paginacao={paginacao}
+            onPagina={(page) => setFiltros((f) => ({ ...f, page }))}
+            onEditar={(c) => { setClienteEditando(c); setModalAberto(true) }}
+            onExcluir={setClienteExcluindo}
+          />
+        </div>
+      </div>
 
       {modalAberto && (
         <ModalCliente
-        key={clienteEditando?.id ?? 'novo'}
-        cliente={clienteEditando}
-        onSalvar={handleSalvar}
-        onFechar={() => {
-          setModalAberto(false)
-          setClienteEditando(null)
-        }}
-        salvando={salvando}
-      />
-    )}
+          key={clienteEditando?.id ?? 'novo'}
+          cliente={clienteEditando}
+          onSalvar={handleSalvar}
+          onFechar={() => { setModalAberto(false); setClienteEditando(null) }}
+          salvando={salvando}
+        />
+      )}
 
       <ModalConfirmacao
         cliente={clienteExcluindo}
@@ -156,11 +137,14 @@ export default function Dashboard() {
         excluindo={excluindo}
       />
 
-      {/* Toast de feedback */}
       {toast && (
-        <div className={`fixed bottom-6 right-6 px-5 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all z-50 ${
-          toast.tipo === 'erro' ? 'bg-red-600' : 'bg-green-600'
-        }`}>
+        <div style={{
+          position: 'fixed', bottom: '24px', right: '24px',
+          padding: '10px 16px', borderRadius: '8px',
+          fontSize: '13px', fontWeight: 500, color: '#fff',
+          background: toast.tipo === 'erro' ? '#a32d2d' : '#3b6d11',
+          zIndex: 100,
+        }}>
           {toast.mensagem}
         </div>
       )}

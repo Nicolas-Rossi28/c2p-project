@@ -1,4 +1,3 @@
-# Imagem base oficial do Python
 FROM python:3.13-slim
 
 WORKDIR /app

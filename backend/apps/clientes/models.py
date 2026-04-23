@@ -6,7 +6,6 @@ from django.db import models
 
 class Cliente(models.Model):
 
-    # Estados brasileiros como choices
     ESTADOS_CHOICES = [
         ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'),
         ('AM', 'Amazonas'), ('BA', 'Bahia'), ('CE', 'Ceará'),

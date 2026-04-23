@@ -5,7 +5,7 @@ from apps.clientes.models import Cliente
 
 
 class Command(BaseCommand):
-    # Texto que aparece no --help do comando
+    
     help = 'Popula o banco com dados iniciais para desenvolvimento'
 
     def handle(self, *args, **kwargs):
@@ -197,7 +197,7 @@ class Command(BaseCommand):
 
         criados = 0
         for data in clientes_data:
-            # get_or_create evita duplicatas se o seed for rodado mais de uma vez
+            
             cliente, created = Cliente.objects.get_or_create(
                 email=data['email'],
                 defaults=data
