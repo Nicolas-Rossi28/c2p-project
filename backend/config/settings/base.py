@@ -2,16 +2,15 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-# Carrega as variáveis do arquivo .env
 load_dotenv()
 
-# Caminho base do projeto (pasta backend/)
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Segurança — nunca deixe isso fixo no código
+
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# Apps instalados no projeto
+# Apps instalados
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,18 +19,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Bibliotecas externas
+    
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
 
-    # Nossas apps (vamos criar em breve)
+    
     'apps.clientes',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # deve vir antes do CommonMiddleware
+    'corsheaders.middleware.CorsMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -59,7 +58,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Configuração do banco de dados (vem das variáveis de ambiente)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -71,7 +70,7 @@ DATABASES = {
     }
 }
 
-# Internacionalização
+
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
@@ -80,7 +79,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuração do Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -92,7 +90,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-# Configuração do JWT
+
 from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),

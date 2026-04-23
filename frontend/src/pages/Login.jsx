@@ -13,67 +13,71 @@ export default function Login() {
     e.preventDefault()
     setErro('')
     setCarregando(true)
-
     try {
       await login(form.username, form.password)
       navigate('/')
     } catch {
       setErro('Usuário ou senha inválidos.')
     } finally {
-      
       setCarregando(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">C2P Sistema</h1>
-        <p className="text-gray-500 mb-6">Faça login para continuar</p>
+    <div style={{ minHeight: '100vh', background: '#1a2a4a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '380px', padding: '0 16px' }}>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Usuário
-            </label>
-            <input
-              type="text"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="admin"
-              required
-            />
-          </div>
+        {/* Logo */}
+        <div style={{ marginBottom: '28px' }}>
+          <div style={{ fontSize: '60px', fontWeight: 750, color: '#d4a017', letterSpacing: '-0.5px' }}>C2P</div>
+          <div style={{ fontSize: '20px', color: '#fdfdfd', marginTop: '15px' }}>Faça login para continuar</div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Senha
-            </label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          {erro && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-              {erro}
+        <div style={{ background: '#fff', border: '1px solid #ebebea', borderRadius: '12px', padding: '24px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '20px', color: '#888780', fontWeight: 500, marginBottom: '5px' }}>Usuário</label>
+              <input
+                type="text"
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                placeholder="admin"
+                required
+                style={{ width: '100%', background: '#fafaf8', border: '1px solid #ebebea', borderRadius: '6px', padding: '8px 10px', fontSize: '13px', color: '#1c1c1a', outline: 'none' }}
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={carregando}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 rounded-lg transition-colors"
-          >
-            {carregando ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+            <div>
+              <label style={{ display: 'block', fontSize: '20px', color: '#888780', fontWeight: 500, marginBottom: '5px' }}>Senha</label>
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder="••••••••"
+                required
+                style={{ width: '100%', background: '#fafaf8', border: '1px solid #ebebea', borderRadius: '6px', padding: '8px 10px', fontSize: '13px', color: '#1c1c1a', outline: 'none' }}
+              />
+            </div>
+
+            {erro && (
+              <div style={{ background: '#fcebeb', border: '1px solid #f09595', borderRadius: '6px', padding: '8px 12px', fontSize: '12px', color: '#a32d2d' }}>
+                {erro}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={carregando}
+              style={{ padding: '9px', background: '#1c1c1a', color: '#f0efe8', border: 'none', borderRadius: '7px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', opacity: carregando ? 0.7 : 1, marginTop: '4px' }}
+            >
+              {carregando ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: '#b4b2a9' }}>
+          admin / admin123
+        </div>
       </div>
     </div>
   )

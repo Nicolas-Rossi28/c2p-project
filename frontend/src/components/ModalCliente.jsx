@@ -6,128 +6,111 @@ const ESTADOS = [
   'RS','RO','RR','SC','SP','SE','TO'
 ]
 
-const FORM_INICIAL = {
-  nome: '', email: '', telefone: '',
-  cidade: '', estado: '', ativo: true,
-}
+const FORM_INICIAL = { nome: '', email: '', telefone: '', cidade: '', estado: '', ativo: true }
+
+const inputStyle = (erro) => ({
+  width: '100%', background: '#fafaf8',
+  border: `1px solid ${erro ? '#f09595' : '#ebebea'}`,
+  borderRadius: '6px', padding: '7px 10px',
+  fontSize: '13px', color: '#1c1c1a', outline: 'none',
+})
 
 export default function ModalCliente({ cliente, onSalvar, onFechar, salvando }) {
   const [form, setForm] = useState(cliente ?? FORM_INICIAL)
   const [erros, setErros] = useState({})
 
   const validar = () => {
-    const novosErros = {}
-    if (!form.nome.trim()) novosErros.nome = 'Nome é obrigatório'
-    if (!form.email.trim()) novosErros.email = 'Email é obrigatório'
-    if (!/\S+@\S+\.\S+/.test(form.email)) novosErros.email = 'Email inválido'
-    if (!form.telefone.trim()) novosErros.telefone = 'Telefone é obrigatório'
-    if (!form.estado) novosErros.estado = 'Estado é obrigatório'
-    return novosErros
+    const e = {}
+    if (!form.nome.trim()) e.nome = 'Obrigatório'
+    if (!form.email.trim()) e.email = 'Obrigatório'
+    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Email inválido'
+    if (!form.telefone.trim()) e.telefone = 'Obrigatório'
+    if (!form.estado) e.estado = 'Obrigatório'
+    return e
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const novosErros = validar()
-    if (Object.keys(novosErros).length > 0) {
-      setErros(novosErros)
-      return
-    }
+    const errosVal = validar()
+    if (Object.keys(errosVal).length > 0) { setErros(errosVal); return }
     onSalvar(form)
   }
 
   const campo = (label, name, tipo = 'text') => (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label style={{ display: 'block', fontSize: '12px', color: '#888780', marginBottom: '5px', fontWeight: 500 }}>
         {label}
       </label>
       <input
         type={tipo}
         value={form[name]}
         onChange={(e) => setForm({ ...form, [name]: e.target.value })}
-        className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          erros[name] ? 'border-red-400' : 'border-gray-300'
-        }`}
+        style={inputStyle(erros[name])}
       />
-      {erros[name] && (
-        <p className="text-red-500 text-xs mt-1">{erros[name]}</p>
-      )}
+      {erros[name] && <p style={{ fontSize: '11px', color: '#a32d2d', marginTop: '3px' }}>{erros[name]}</p>}
     </div>
   )
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onFechar}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '16px' }}
     >
       <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-lg"
         onClick={(e) => e.stopPropagation()}
+        style={{ background: '#fff', borderRadius: '12px', width: '100%', maxWidth: '480px', border: '1px solid #ebebea' }}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">
-            {cliente?.id ? 'Editar Cliente' : 'Novo Cliente'}
-          </h2>
-          <button
-            onClick={onFechar}
-            className="text-gray-400 hover:text-gray-600 text-xl font-bold"
-          >
-            ×
-          </button>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #ebebea' }}>
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: '#1c1c1a' }}>
+              {cliente?.id ? 'Editar Cliente' : 'Novo Cliente'}
+            </div>
+            <div style={{ fontSize: '12px', color: '#888780', marginTop: '1px' }}>
+              {cliente?.id ? 'Atualize os dados do cliente' : 'Preencha os dados do novo cliente'}
+            </div>
+          </div>
+          <button onClick={onFechar} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#b4b2a9', lineHeight: 1 }}>×</button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {campo('Nome', 'nome')}
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            {campo('Nome completo', 'nome')}
+            {campo('Telefone', 'telefone', 'tel')}
+          </div>
           {campo('Email', 'email', 'email')}
-          {campo('Telefone', 'telefone', 'tel')}
-          {campo('Cidade', 'cidade')}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Estado
-            </label>
-            <select
-              value={form.estado}
-              onChange={(e) => setForm({ ...form, estado: e.target.value })}
-              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                erros.estado ? 'border-red-400' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Selecione...</option>
-              {ESTADOS.map((uf) => (
-                <option key={uf} value={uf}>{uf}</option>
-              ))}
-            </select>
-            {erros.estado && (
-              <p className="text-red-500 text-xs mt-1">{erros.estado}</p>
-            )}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            {campo('Cidade', 'cidade')}
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', color: '#888780', marginBottom: '5px', fontWeight: 500 }}>Estado</label>
+              <select
+                value={form.estado}
+                onChange={(e) => setForm({ ...form, estado: e.target.value })}
+                style={{ ...inputStyle(erros.estado), appearance: 'none' }}
+              >
+                <option value="">Selecione...</option>
+                {ESTADOS.map((uf) => <option key={uf} value={uf}>{uf}</option>)}
+              </select>
+              {erros.estado && <p style={{ fontSize: '11px', color: '#a32d2d', marginTop: '3px' }}>{erros.estado}</p>}
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
             <input
               type="checkbox"
-              id="ativo"
               checked={form.ativo}
               onChange={(e) => setForm({ ...form, ativo: e.target.checked })}
-              className="w-4 h-4 accent-blue-600"
+              style={{ accentColor: '#1a3a2a', width: '14px', height: '14px' }}
             />
-            <label htmlFor="ativo" className="text-sm font-medium text-gray-700">
-              Cliente ativo
-            </label>
-          </div>
+            <span style={{ fontSize: '13px', color: '#444441' }}>Cliente ativo</span>
+          </label>
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onFechar}
-              className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-50 transition-colors"
-            >
+          <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
+            <button type="button" onClick={onFechar} style={{ flex: 1, padding: '8px', border: '1px solid #ebebea', borderRadius: '7px', fontSize: '13px', color: '#5f5e5a', background: '#fafaf8', cursor: 'pointer' }}>
               Cancelar
             </button>
-            <button
-              type="submit"
-              disabled={salvando}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 rounded-lg text-sm font-medium transition-colors"
-            >
+            <button type="submit" disabled={salvando} style={{ flex: 1, padding: '8px', border: '1px solid #2a5a40', borderRadius: '7px', fontSize: '13px', fontWeight: 500, color: '#7bc4a0', background: '#1a3a2a', cursor: 'pointer', opacity: salvando ? 0.6 : 1 }}>
               {salvando ? 'Salvando...' : 'Salvar'}
             </button>
           </div>

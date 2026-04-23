@@ -1,58 +1,34 @@
-export default function CardsResumo({ resumo, carregando }) {
-  const cards = [
-    {
-      label: 'Total de Clientes',
-      valor: resumo?.total ?? '—',
-      cor: 'bg-blue-50 border-blue-200',
-      corTexto: 'text-blue-700',
-      corValor: 'text-blue-900',
-    },
-    {
-      label: 'Clientes Ativos',
-      valor: resumo?.ativos ?? '—',
-      cor: 'bg-green-50 border-green-200',
-      corTexto: 'text-green-700',
-      corValor: 'text-green-900',
-    },
-    {
-      label: 'Clientes Inativos',
-      valor: resumo?.inativos ?? '—',
-      cor: 'bg-red-50 border-red-200',
-      corTexto: 'text-red-700',
-      corValor: 'text-red-900',
-    },
-    {
-      label: 'Cadastrados Hoje',
-      valor: resumo?.cadastrados_hoje ?? '—',
-      cor: 'bg-purple-50 border-purple-200',
-      corTexto: 'text-purple-700',
-      corValor: 'text-purple-900',
-    },
-  ]
+const cards = (resumo) => [
+  { label: 'Total', valor: resumo?.total ?? '—', cor: '#1c1c1a', barra: '#d3d1c7', pct: '100%' },
+  { label: 'Ativos', valor: resumo?.ativos ?? '—', cor: '#3b6d11', barra: '#97c459', pct: resumo ? `${Math.round((resumo.ativos / resumo.total) * 100)}%` : '0%' },
+  { label: 'Inativos', valor: resumo?.inativos ?? '—', cor: '#a32d2d', barra: '#f09595', pct: resumo ? `${Math.round((resumo.inativos / resumo.total) * 100)}%` : '0%' },
+  { label: 'Hoje', valor: resumo?.cadastrados_hoje ?? '—', cor: '#888780', barra: '#d3d1c7', pct: '0%' },
+]
 
+export default function CardsResumo({ resumo, carregando }) {
   if (carregando) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '14px' }}>
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-gray-100 rounded-xl h-24 animate-pulse" />
+          <div key={i} style={{ background: '#fff', border: '1px solid #ebebea', borderRadius: '10px', padding: '14px 16px', height: '80px', opacity: 0.5 }} />
         ))}
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      {cards.map((card) => (
-        <div
-          key={card.label}
-          className={`${card.cor} border rounded-xl p-4`}
-        >
-          <p className={`text-sm font-medium ${card.corTexto}`}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '14px' }}>
+      {cards(resumo).map((card) => (
+        <div key={card.label} style={{ background: '#fff', border: '1px solid #ebebea', borderRadius: '10px', padding: '14px 16px' }}>
+          <div style={{ fontSize: '11px', color: '#888780', marginBottom: '6px', fontWeight: 500 }}>
             {card.label}
-          </p>
-          <p className={`text-3xl font-bold mt-1 ${card.corValor}`}>
+          </div>
+          <div style={{ fontSize: '26px', fontWeight: 600, color: card.cor, letterSpacing: '-0.5px' }}>
             {card.valor}
-          </p>
+          </div>
+          <div style={{ height: '2px', borderRadius: '2px', marginTop: '10px', background: '#f1efe8' }}>
+            <div style={{ height: '100%', borderRadius: '2px', width: card.pct, background: card.barra, transition: 'width 0.5s ease' }} />
+          </div>
         </div>
       ))}
     </div>
