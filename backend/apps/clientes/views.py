@@ -18,7 +18,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
     serializer_class = ClienteSerializer
     permission_classes = [IsAuthenticated]
 
-    # Habilita busca e filtro automáticos
+    
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['nome', 'email', 'cidade']
     ordering_fields = ['nome', 'data_criacao', 'ativo']
@@ -58,7 +58,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
             data_criacao__date=hoje
         ).count()
 
-        # Agrupa clientes por estado com contagem
+        
         por_estado = (
             Cliente.objects
             .values('estado')

@@ -9,7 +9,7 @@ const api = axios.create({
   },
 })
 
-// INTERCEPTOR DE REQUEST
+
 // Executa antes de TODA requisição ser enviada
 // Injeta o token JWT automaticamente — sem isso você teria que
 // passar o header manualmente em cada chamada
@@ -24,7 +24,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// INTERCEPTOR DE RESPONSE
+
 // Executa depois de TODA resposta recebida
 // Se receber 401 (não autorizado), tenta renovar o token automaticamente
 api.interceptors.response.use(

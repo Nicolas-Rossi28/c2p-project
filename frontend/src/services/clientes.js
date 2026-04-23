@@ -1,9 +1,5 @@
 import api from './api'
 
-// Todas as chamadas relacionadas a clientes ficam aqui
-// As páginas não sabem como a API funciona — só chamam essas funções
-// Isso é o princípio de separação de responsabilidades
-
 export const clientesService = {
 
   listar: (params = {}) => {
@@ -22,8 +18,6 @@ export const clientesService = {
   },
 
   atualizar: (id, dados) => {
-    // PATCH atualiza só os campos enviados
-    // PUT exigiria enviar todos os campos
     return api.patch(`/clientes/${id}/`, dados)
   },
 

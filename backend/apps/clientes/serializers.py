@@ -4,7 +4,7 @@ from .models import Cliente
 
 
 class ClienteSerializer(serializers.ModelSerializer):
-    # Campo extra apenas para leitura — mostra o nome do estado por extenso
+    
     estado_display = serializers.CharField(
         source='get_estado_display',
         read_only=True
@@ -24,7 +24,7 @@ class ClienteSerializer(serializers.ModelSerializer):
             'data_criacao',
             'data_atualizacao',
         ]
-        # Esses campos são gerados automaticamente — o cliente não envia
+        
         read_only_fields = ['id', 'data_criacao', 'data_atualizacao']
 
     def validate_nome(self, value):
@@ -38,7 +38,7 @@ class ClienteSerializer(serializers.ModelSerializer):
         Valida formato básico de telefone brasileiro.
         Aceita: (41) 99999-9999 ou 41999999999 ou variações.
         """
-        # Remove tudo que não é número
+        
         numeros = re.sub(r'\D', '', value)
 
         if len(numeros) < 10 or len(numeros) > 11:
@@ -52,7 +52,7 @@ class ClienteSerializer(serializers.ModelSerializer):
         Garante que o email é único — mas ignora o próprio registro
         em caso de edição (update).
         """
-        # self.instance existe quando é um UPDATE, não em CREATE
+        
         qs = Cliente.objects.filter(email=value)
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)
@@ -60,7 +60,7 @@ class ClienteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Já existe um cliente com este email.'
             )
-        return value.lower()  # sempre salva em minúsculo
+        return value.lower()  
 
 
 class ClienteResumoSerializer(serializers.Serializer):
