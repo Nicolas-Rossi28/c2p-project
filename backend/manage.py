@@ -7,7 +7,7 @@ def main():
         'config.settings.development'
     )
     try:
-        from django.core.management import execute_from_command_line
+        from django.core.management import execute_from_command_line  # type: ignore[import]
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you on the right virtualenv?"
