@@ -20,7 +20,7 @@ export default function Login() {
     } catch {
       setErro('Usuário ou senha inválidos.')
     } finally {
-      // finally sempre executa — garante que o loading para
+      
       setCarregando(false)
     }
   }

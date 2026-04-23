@@ -25,8 +25,7 @@ export default function Dashboard() {
   const [clienteExcluindo, setClienteExcluindo] = useState(null)
   const [toast, setToast] = useState(null)
 
-  // useCallback evita recriar a função a cada render
-  // Isso é importante porque ela é usada como dependência no useEffect
+  
   const carregarClientes = useCallback(async () => {
     setCarregandoClientes(true)
     try {
@@ -51,18 +50,18 @@ export default function Dashboard() {
       const response = await clientesService.resumo()
       setResumo(response.data)
     } catch {
-      // Silencioso — o resumo é secundário
+      //
     } finally {
       setCarregandoResumo(false)
     }
   }
 
-  // Recarrega clientes sempre que os filtros mudam
+  
   useEffect(() => {
     carregarClientes()
   }, [carregarClientes])
 
-  // Resumo carrega só uma vez na montagem
+  
   useEffect(() => {
     carregarResumo()
   }, [])

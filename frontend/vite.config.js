@@ -8,7 +8,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
-    host: '0.0.0.0',  // necessário para o Docker
+    host: '0.0.0.0',  
     port: 5173,
   }
 })
