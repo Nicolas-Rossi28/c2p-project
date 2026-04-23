@@ -1,28 +1,22 @@
 services:
 
-  # Banco de dados PostgreSQL
   db:
     image: postgres:16-alpine
-    # "alpine" é uma versão minimalista do Linux — imagem menor
     container_name: c2p_db
     environment:
       POSTGRES_DB: c2p_db
       POSTGRES_USER: c2p_user
       POSTGRES_PASSWORD: c2p_password
     volumes:
-      # Persiste os dados do banco fora do container
-      # Sem isso, todos os dados somem quando o container para
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      # Verifica se o banco está pronto antes de subir o backend
       test: ["CMD-SHELL", "pg_isready -U c2p_user -d c2p_db"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  # Backend Django
   backend:
     build:
       context: ./backend
@@ -34,23 +28,34 @@ services:
       DB_NAME: c2p_db
       DB_USER: c2p_user
       DB_PASSWORD: c2p_password
-      DB_HOST: db        # nome do serviço acima — o Docker resolve o DNS
+      DB_HOST: db
       DB_PORT: "5432"
       DJANGO_SETTINGS_MODULE: config.settings.development
     volumes:
-      # Monta o código local dentro do container
-      # Mudanças no código refletem sem precisar rebuild
       - ./backend:/app
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
-    # Comando sobrescreve o CMD do Dockerfile em desenvolvimento
     command: >
       sh -c "python manage.py migrate &&
+             python manage.py seed &&
              python manage.py runserver 0.0.0.0:8000"
 
-# Volume nomeado — gerenciado pelo Docker, persiste entre restarts
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: c2p_frontend
+    volumes:
+      - ./frontend:/app
+      # Preserva o node_modules do container — não sobrescreve com o local
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
